@@ -1,0 +1,26 @@
+[
+  {
+    "id": "triage-invoice-overdue",
+    "capability": "triage_classify",
+    "taskType": "triage_classify",
+    "system": "Classify the message into exactly one label: urgent, needs_reply, fyi, spam, task, invoice, lead, complaint. Reply with only the label.",
+    "input": "Hi, just a reminder that invoice #4521 for $1,200 is now 15 days overdue. Please process payment at your earliest convenience.",
+    "expectedContains": "invoice"
+  },
+  {
+    "id": "triage-new-lead",
+    "capability": "triage_classify",
+    "taskType": "triage_classify",
+    "system": "Classify the message into exactly one label: urgent, needs_reply, fyi, spam, task, invoice, lead, complaint. Reply with only the label.",
+    "input": "Hi, I found your business on Instagram and I'm interested in getting a quote for 500 units. Can someone call me?",
+    "expectedContains": "lead"
+  },
+  {
+    "id": "triage-complaint",
+    "capability": "triage_classify",
+    "taskType": "triage_classify",
+    "system": "Classify the message into exactly one label: urgent, needs_reply, fyi, spam, task, invoice, lead, complaint. Reply with only the label.",
+    "input": "This is the third time my order has arrived damaged. I want a refund and I'm extremely unhappy with the service.",
+    "expectedContains": "complaint"
+  }
+]

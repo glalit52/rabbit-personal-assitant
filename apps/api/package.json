@@ -1,0 +1,29 @@
+{
+  "name": "@agent/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@agent/audit": "workspace:*",
+    "@agent/auth": "workspace:*",
+    "@agent/core": "workspace:*",
+    "@agent/db": "workspace:*",
+    "@agent/event-bus": "workspace:*",
+    "@agent/model-router": "workspace:*",
+    "@agent/policy-engine": "workspace:*",
+    "@agent/secrets": "workspace:*",
+    "@fastify/cors": "^10.0.1",
+    "drizzle-orm": "^0.36.1",
+    "fastify": "^5.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "tsx": "^4.19.1",
+    "@types/node": "^20.16.11"
+  }
+}

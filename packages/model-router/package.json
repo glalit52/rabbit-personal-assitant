@@ -1,0 +1,19 @@
+{
+  "name": "@agent/model-router",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@agent/core": "workspace:*",
+    "@anthropic-ai/sdk": "^0.32.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "@types/node": "^20.16.11"
+  }
+}

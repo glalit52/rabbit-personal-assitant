@@ -1,0 +1,26 @@
+{
+  "name": "rabbit-personal-assistant",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Personal & Business AI Agent — monorepo (Phase 0: foundations)",
+  "packageManager": "pnpm@9.12.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "pnpm -r --filter=./packages/* build && pnpm -r --filter=./apps/* build",
+    "dev:api": "pnpm --filter @agent/api dev",
+    "dev:web": "pnpm --filter @agent/web dev",
+    "db:generate": "pnpm --filter @agent/db generate",
+    "db:migrate": "pnpm --filter @agent/db migrate",
+    "evals": "pnpm --filter @agent/evals run start",
+    "typecheck": "pnpm -r exec tsc --noEmit",
+    "lint": "eslint . --ext .ts,.tsx"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "tsx": "^4.19.1",
+    "@types/node": "^20.16.11",
+    "eslint": "^8.57.1"
+  }
+}
