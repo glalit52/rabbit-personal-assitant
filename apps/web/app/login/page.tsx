@@ -27,7 +27,7 @@ export default function LoginPage() {
               body: JSON.stringify({ tenantName, tenantType, email, password }),
             });
       setSession(session);
-      router.push("/approvals");
+      router.push("/brief");
     } catch (err) {
       setError((err as Error).message);
     } finally {

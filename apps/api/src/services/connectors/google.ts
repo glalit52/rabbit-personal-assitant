@@ -3,6 +3,7 @@ import { schema, type Database } from "@agent/db";
 import { google } from "@agent/connectors";
 import type { Vault } from "@agent/secrets";
 import { env } from "../../env.js";
+import { disconnectProvider } from "./shared.js";
 
 export class GoogleNotConnectedError extends Error {
   constructor(tenantId: string) {
@@ -25,7 +26,9 @@ export async function connectGoogleAccount(db: Database, vault: Vault, tenantId:
   const tokenSet = await google.exchangeGoogleAuthCode(config, code);
   const email = await google.fetchGoogleEmail(tokenSet.accessToken);
 
+  // Mail + calendar is one provider at a time (PRD's "1 to 3 email accounts" is a later multi-account phase).
   await disconnectProvider(db, tenantId, "google");
+  await disconnectProvider(db, tenantId, "microsoft");
 
   const encrypted = await vault.encrypt({ ...tokenSet });
   const [credential] = await db
@@ -86,16 +89,5 @@ export async function getValidGoogleAccessToken(db: Database, vault: Vault, tena
   } catch (err) {
     await db.update(schema.identities).set({ health: "expired", updatedAt: new Date() }).where(eq(schema.identities.id, identity.id));
     throw err;
-  }
-}
-
-export async function disconnectProvider(db: Database, tenantId: string, provider: string): Promise<void> {
-  const existing = await db.query.identities.findFirst({
-    where: and(eq(schema.identities.tenantId, tenantId), eq(schema.identities.provider, provider)),
-  });
-  if (!existing) return;
-  await db.delete(schema.identities).where(eq(schema.identities.id, existing.id));
-  if (existing.credentialId) {
-    await db.delete(schema.credentials).where(eq(schema.credentials.id, existing.credentialId));
   }
 }

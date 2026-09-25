@@ -1,14 +1,16 @@
-/** A connected external account (email inbox, WhatsApp number, calendar, CRM, ...). */
+/**
+ * A connected external account. `google` and `microsoft` each cover mail + calendar
+ * in one OAuth connection (Gmail+Calendar, Outlook mail+Calendar respectively) —
+ * matching how each provider's own OAuth consent screen works, rather than treating
+ * mail and calendar as separate connections to the same account.
+ */
 export type Provider =
-  | "gmail"
-  | "google_workspace"
-  | "outlook"
+  | "google"
+  | "microsoft"
   | "imap"
   | "whatsapp_business"
   | "sms"
   | "voice"
-  | "google_calendar"
-  | "microsoft_calendar"
   | "google_drive"
   | "hubspot"
   | "salesforce"

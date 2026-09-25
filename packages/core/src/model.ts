@@ -7,6 +7,7 @@ export type ModelTaskType =
   | "agent_loop"
   | "draft_reply"
   | "triage_classify"
+  | "extract_commitment"
   | "voice_turn"
   | "live_search"
   | "long_document_analysis"

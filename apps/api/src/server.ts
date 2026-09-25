@@ -11,6 +11,8 @@ import { auditRoutes } from "./routes/audit.js";
 import { policyRoutes } from "./routes/policy.js";
 import { connectorRoutes } from "./routes/connectors.js";
 import { webhookRoutes } from "./routes/webhooks.js";
+import { commitmentRoutes } from "./routes/commitments.js";
+import { briefRoutes } from "./routes/brief.js";
 import { startOrchestrator } from "./services/orchestrator.js";
 
 export async function buildServer() {
@@ -29,6 +31,8 @@ export async function buildServer() {
   await app.register(policyRoutes(ctx));
   await app.register(connectorRoutes(ctx));
   await app.register(webhookRoutes(ctx));
+  await app.register(commitmentRoutes(ctx));
+  await app.register(briefRoutes(ctx));
 
   const stopOrchestrator = startOrchestrator(ctx);
   app.addHook("onClose", async () => {

@@ -40,4 +40,10 @@ export const env = {
   get whatsappWebhookVerifyToken() {
     return process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN;
   },
+  get microsoft() {
+    const clientId = process.env.MICROSOFT_CLIENT_ID;
+    const clientSecret = process.env.MICROSOFT_CLIENT_SECRET;
+    if (!clientId || !clientSecret) return undefined;
+    return { clientId, clientSecret, redirectUri: `${env.apiUrl}/connectors/microsoft/callback` };
+  },
 };

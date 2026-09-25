@@ -27,4 +27,14 @@ export function registerRawBodyPlugin(app: FastifyInstance): void {
       done(err as Error, undefined);
     }
   });
+
+  // Twilio posts webhooks as form-urlencoded; its signature is computed over the
+  // parsed key/value pairs (not the raw bytes), so a flat object is all that's needed.
+  app.addContentTypeParser(
+    "application/x-www-form-urlencoded",
+    { parseAs: "string" },
+    (_request, body, done) => {
+      done(null, Object.fromEntries(new URLSearchParams(body as string)));
+    },
+  );
 }

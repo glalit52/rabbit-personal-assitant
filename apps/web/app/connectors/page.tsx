@@ -4,10 +4,21 @@ import { Suspense, useEffect, useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { apiFetch, getSession } from "@/lib/api";
 
+interface ProviderStatus {
+  connected: boolean;
+  email?: string;
+  phoneNumberId?: string;
+  fromNumber?: string;
+  health?: string;
+}
+
 interface ConnectorStatus {
-  google: { connected: boolean; email?: string; health?: string };
-  whatsapp: { connected: boolean; phoneNumberId?: string; health?: string };
+  google: ProviderStatus;
+  microsoft: ProviderStatus;
+  whatsapp: ProviderStatus;
+  sms: ProviderStatus;
   googleOAuthConfigured: boolean;
+  microsoftOAuthConfigured: boolean;
 }
 
 export default function ConnectorsPage() {
@@ -26,6 +37,7 @@ function ConnectorsPageContent() {
   const [notice, setNotice] = useState<string | null>(null);
   const [syncing, setSyncing] = useState(false);
   const [waForm, setWaForm] = useState({ phoneNumberId: "", accessToken: "", wabaId: "" });
+  const [smsForm, setSmsForm] = useState({ accountSid: "", authToken: "", fromNumber: "" });
 
   const load = useCallback(async () => {
     if (!getSession()) {
@@ -44,25 +56,28 @@ function ConnectorsPageContent() {
     const googleResult = searchParams.get("google");
     if (googleResult === "connected") setNotice("Google account connected.");
     if (googleResult === "error") setError("Connecting your Google account failed — check the server logs.");
+    const msResult = searchParams.get("microsoft");
+    if (msResult === "connected") setNotice("Microsoft account connected.");
+    if (msResult === "error") setError("Connecting your Microsoft account failed — check the server logs.");
   }, [load, searchParams]);
 
-  async function connectGoogle() {
+  async function connect(provider: "google" | "microsoft") {
     setError(null);
     try {
-      const { url } = await apiFetch<{ url: string }>("/connectors/google/connect");
+      const { url } = await apiFetch<{ url: string }>(`/connectors/${provider}/connect`);
       window.location.href = url;
     } catch (err) {
       setError((err as Error).message);
     }
   }
 
-  async function syncGmail() {
+  async function sync(provider: "gmail" | "outlook") {
     setSyncing(true);
     setError(null);
     setNotice(null);
     try {
-      const result = await apiFetch<{ synced: number }>("/connectors/gmail/sync", { method: "POST" });
-      setNotice(`Synced ${result.synced} new message${result.synced === 1 ? "" : "s"} from Gmail.`);
+      const result = await apiFetch<{ synced: number }>(`/connectors/${provider}/sync`, { method: "POST" });
+      setNotice(`Synced ${result.synced} new message${result.synced === 1 ? "" : "s"}.`);
     } catch (err) {
       setError((err as Error).message);
     } finally {
@@ -70,7 +85,7 @@ function ConnectorsPageContent() {
     }
   }
 
-  async function disconnect(provider: "google" | "whatsapp") {
+  async function disconnect(provider: "google" | "microsoft" | "whatsapp" | "sms") {
     await apiFetch(`/connectors/${provider}/disconnect`, { method: "POST" });
     load();
   }
@@ -88,9 +103,24 @@ function ConnectorsPageContent() {
     }
   }
 
+  async function submitSms(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    try {
+      await apiFetch("/connectors/twilio/configure", { method: "POST", body: JSON.stringify(smsForm) });
+      setNotice("Twilio SMS number configured.");
+      setSmsForm({ accountSid: "", authToken: "", fromNumber: "" });
+      load();
+    } catch (err) {
+      setError((err as Error).message);
+    }
+  }
+
   if (!status) {
     return error ? <p className="error">{error}</p> : <p className="muted">Loading…</p>;
   }
+
+  const emailConnected = status.google.connected || status.microsoft.connected;
 
   return (
     <div>
@@ -101,34 +131,51 @@ function ConnectorsPageContent() {
 
       <div className="card">
         <div className="row" style={{ justifyContent: "space-between", marginTop: 0 }}>
-          <h3>Gmail &amp; Google Calendar</h3>
-          <span className={`badge ${status.google.connected ? "executed" : ""}`}>
-            {status.google.connected ? "connected" : "not connected"}
-          </span>
+          <h3>Email &amp; Calendar</h3>
+          <span className={`badge ${emailConnected ? "executed" : ""}`}>{emailConnected ? "connected" : "not connected"}</span>
         </div>
-        {status.google.connected ? (
-          <>
-            <p className="muted">{status.google.email}</p>
-            <div className="row">
-              <button className="primary" onClick={syncGmail} disabled={syncing}>
-                {syncing ? "Syncing…" : "Sync Gmail now"}
+        <p className="muted">One provider at a time — connecting the other replaces this one.</p>
+        {status.google.connected && (
+          <div className="row" style={{ justifyContent: "space-between" }}>
+            <span>Gmail &amp; Google Calendar — {status.google.email}</span>
+            <div className="row" style={{ marginTop: 0 }}>
+              <button onClick={() => sync("gmail")} disabled={syncing}>
+                {syncing ? "Syncing…" : "Sync now"}
               </button>
               <button className="danger" onClick={() => disconnect("google")}>
                 Disconnect
               </button>
             </div>
-          </>
-        ) : (
-          <>
-            {!status.googleOAuthConfigured && (
-              <p className="muted">
-                Server has no Google OAuth client configured — set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET (see README).
-              </p>
-            )}
-            <button className="primary" onClick={connectGoogle} disabled={!status.googleOAuthConfigured}>
+          </div>
+        )}
+        {status.microsoft.connected && (
+          <div className="row" style={{ justifyContent: "space-between" }}>
+            <span>Outlook &amp; Microsoft Calendar — {status.microsoft.email}</span>
+            <div className="row" style={{ marginTop: 0 }}>
+              <button onClick={() => sync("outlook")} disabled={syncing}>
+                {syncing ? "Syncing…" : "Sync now"}
+              </button>
+              <button className="danger" onClick={() => disconnect("microsoft")}>
+                Disconnect
+              </button>
+            </div>
+          </div>
+        )}
+        {!emailConnected && (
+          <div className="row">
+            <button className="primary" onClick={() => connect("google")} disabled={!status.googleOAuthConfigured}>
               Connect Google
             </button>
-          </>
+            <button className="primary" onClick={() => connect("microsoft")} disabled={!status.microsoftOAuthConfigured}>
+              Connect Microsoft
+            </button>
+          </div>
+        )}
+        {!status.googleOAuthConfigured && !status.microsoftOAuthConfigured && !emailConnected && (
+          <p className="muted">
+            Server has no OAuth client configured for either provider — set GOOGLE_CLIENT_ID/SECRET or
+            MICROSOFT_CLIENT_ID/SECRET (see README).
+          </p>
         )}
       </div>
 
@@ -165,6 +212,52 @@ function ConnectorsPageContent() {
                 type="password"
                 value={waForm.accessToken}
                 onChange={(e) => setWaForm({ ...waForm, accessToken: e.target.value })}
+                required
+              />
+              <div className="row">
+                <button className="primary" type="submit">
+                  Save
+                </button>
+              </div>
+            </form>
+          </>
+        )}
+      </div>
+
+      <div className="card">
+        <div className="row" style={{ justifyContent: "space-between", marginTop: 0 }}>
+          <h3>SMS (Twilio)</h3>
+          <span className={`badge ${status.sms.connected ? "executed" : ""}`}>
+            {status.sms.connected ? "connected" : "not connected"}
+          </span>
+        </div>
+        {status.sms.connected ? (
+          <>
+            <p className="muted">from: {status.sms.fromNumber}</p>
+            <button className="danger" onClick={() => disconnect("sms")}>
+              Disconnect
+            </button>
+          </>
+        ) : (
+          <>
+            <p className="muted">
+              From a <a href="https://console.twilio.com" target="_blank" rel="noreferrer">Twilio console</a>, copy your
+              Account SID, an auth token, and a purchased phone number.
+            </p>
+            <form onSubmit={submitSms}>
+              <label>Account SID</label>
+              <input value={smsForm.accountSid} onChange={(e) => setSmsForm({ ...smsForm, accountSid: e.target.value })} required />
+              <label>Auth token</label>
+              <input
+                type="password"
+                value={smsForm.authToken}
+                onChange={(e) => setSmsForm({ ...smsForm, authToken: e.target.value })}
+                required
+              />
+              <label>From number (E.164, e.g. +15551234567)</label>
+              <input
+                value={smsForm.fromNumber}
+                onChange={(e) => setSmsForm({ ...smsForm, fromNumber: e.target.value })}
                 required
               />
               <div className="row">

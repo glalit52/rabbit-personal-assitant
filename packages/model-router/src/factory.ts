@@ -66,6 +66,7 @@ function buildRoutingTable(env: NodeJS.ProcessEnv): Partial<Record<ModelTaskType
     agent_loop: ["claude-top", "claude-mid", "grok", ...mockFallback],
     draft_reply: ["claude-mid", "grok", ...mockFallback],
     triage_classify: ["claude-fast", "grok-fast", ...mockFallback],
+    extract_commitment: ["claude-fast", "grok-fast", ...mockFallback],
     voice_turn: ["claude-fast", "grok-fast", ...mockFallback],
     live_search: ["grok", "claude-mid", ...mockFallback],
     long_document_analysis: ["claude-top", "grok", ...mockFallback],

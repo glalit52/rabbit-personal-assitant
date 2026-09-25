@@ -1,8 +1,9 @@
 import type { FastifyInstance } from "fastify";
-import { whatsapp } from "@agent/connectors";
+import { whatsapp, twilio as twilioApi } from "@agent/connectors";
 import type { AppContext } from "../context.js";
 import { env } from "../env.js";
 import { findTenantIdByWhatsAppPhoneNumberId } from "../services/connectors/whatsapp.js";
+import { findTenantIdByTwilioNumber, getTwilioConfig } from "../services/connectors/twilio.js";
 import { ingestInboundMessage } from "../services/ingestion.js";
 
 /**
@@ -54,6 +55,45 @@ export function webhookRoutes(ctx: AppContext) {
           providerMessageId: message.messageId,
         });
       }
+    });
+
+    // Twilio (SMS): each tenant brings their own Twilio account, so the webhook
+    // signature is verified with that tenant's own auth token, not a shared secret —
+    // the "To" number (our tenant's Twilio number) is what tells us which one to use.
+    app.post<{ Body: Record<string, string> }>("/webhooks/sms", async (request, reply) => {
+      const params = request.body ?? {};
+      const inbound = twilioApi.parseTwilioInboundSms(params);
+      if (!inbound) {
+        return reply.code(400).send();
+      }
+
+      const tenantId = await findTenantIdByTwilioNumber(ctx.db, inbound.to);
+      if (!tenantId) {
+        app.log.warn(`SMS webhook for unknown Twilio number ${inbound.to}`);
+        return reply.code(404).send();
+      }
+      if (!ctx.vault) {
+        app.log.warn("Rejecting SMS webhook delivery: VAULT_MASTER_KEY is not configured");
+        return reply.code(503).send();
+      }
+
+      const config = await getTwilioConfig(ctx.db, ctx.vault, tenantId);
+      const signature = request.headers["x-twilio-signature"] as string | undefined;
+      const webhookUrl = `${env.apiUrl}/webhooks/sms`;
+      if (!twilioApi.verifyTwilioSignature(config.authToken, webhookUrl, params, signature)) {
+        return reply.code(401).send();
+      }
+
+      // Twilio expects a 200 with TwiML (or an empty body); we reply ourselves via the agent loop, not TwiML.
+      reply.type("text/xml").send("<Response></Response>");
+
+      await ingestInboundMessage(ctx, {
+        tenantId,
+        channel: "sms",
+        contactHandle: inbound.from,
+        content: inbound.body,
+        providerMessageId: inbound.messageSid,
+      });
     });
   };
 }

@@ -2,7 +2,7 @@ import { and, eq } from "drizzle-orm";
 import { schema, type Database } from "@agent/db";
 import type { whatsapp as whatsappApi } from "@agent/connectors";
 import type { Vault } from "@agent/secrets";
-import { disconnectProvider } from "./google.js";
+import { disconnectProvider } from "./shared.js";
 
 export class WhatsAppNotConnectedError extends Error {
   constructor(tenantId: string) {

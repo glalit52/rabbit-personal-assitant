@@ -4,6 +4,7 @@ import type { AgentEvent, TriageLabel } from "@agent/core";
 import type { AppContext } from "../context.js";
 import { getTenantPolicy } from "./policy.js";
 import { CHANNEL_TO_ACTION_TYPE, proposeAndDecideAction } from "./actions.js";
+import { extractCommitment } from "./commitments.js";
 
 /**
  * The agent loop for text channels (PRD §5 orchestrator): on every inbound message,
@@ -57,6 +58,8 @@ async function handleInboundMessage(
   if (triageLabel === "spam") {
     return;
   }
+
+  await extractCommitment(ctx, event.tenantId, message);
 
   const draftResponse = await ctx.modelRouter.route({
     taskType: "draft_reply",

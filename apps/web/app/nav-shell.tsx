@@ -16,6 +16,7 @@ export function NavShell({ children }: { children: React.ReactNode }) {
     <div className="shell">
       <nav className="nav">
         <h1>the Agent</h1>
+        <Link href="/brief">Brief</Link>
         <Link href="/approvals">Approvals</Link>
         <Link href="/activity">Activity</Link>
         <Link href="/policy">Policy</Link>
