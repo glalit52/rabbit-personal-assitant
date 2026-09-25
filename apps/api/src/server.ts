@@ -2,12 +2,15 @@ import Fastify from "fastify";
 import cors from "@fastify/cors";
 import { createAppContext } from "./context.js";
 import { registerAuthPlugin } from "./plugins/auth.js";
+import { registerRawBodyPlugin } from "./plugins/raw-body.js";
 import { healthRoutes } from "./routes/health.js";
 import { authRoutes } from "./routes/auth.js";
 import { eventRoutes } from "./routes/events.js";
 import { actionRoutes } from "./routes/actions.js";
 import { auditRoutes } from "./routes/audit.js";
 import { policyRoutes } from "./routes/policy.js";
+import { connectorRoutes } from "./routes/connectors.js";
+import { webhookRoutes } from "./routes/webhooks.js";
 import { startOrchestrator } from "./services/orchestrator.js";
 
 export async function buildServer() {
@@ -16,6 +19,7 @@ export async function buildServer() {
 
   await app.register(cors, { origin: true });
   registerAuthPlugin(app);
+  registerRawBodyPlugin(app);
 
   await app.register(healthRoutes);
   await app.register(authRoutes(ctx));
@@ -23,6 +27,8 @@ export async function buildServer() {
   await app.register(actionRoutes(ctx));
   await app.register(auditRoutes(ctx));
   await app.register(policyRoutes(ctx));
+  await app.register(connectorRoutes(ctx));
+  await app.register(webhookRoutes(ctx));
 
   const stopOrchestrator = startOrchestrator(ctx);
   app.addHook("onClose", async () => {

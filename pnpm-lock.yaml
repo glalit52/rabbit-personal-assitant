@@ -29,6 +29,9 @@ importers:
       '@agent/auth':
         specifier: workspace:*
         version: link:../../packages/auth
+      '@agent/connectors':
+        specifier: workspace:*
+        version: link:../../packages/connectors
       '@agent/core':
         specifier: workspace:*
         version: link:../../packages/core
@@ -129,6 +132,19 @@ importers:
       '@types/jsonwebtoken':
         specifier: ^9.0.7
         version: 9.0.10
+      '@types/node':
+        specifier: ^20.16.11
+        version: 20.19.43
+      typescript:
+        specifier: ^5.6.3
+        version: 5.9.3
+
+  packages/connectors:
+    dependencies:
+      '@agent/core':
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
       '@types/node':
         specifier: ^20.16.11
         version: 20.19.43

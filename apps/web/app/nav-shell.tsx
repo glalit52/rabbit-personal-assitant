@@ -19,6 +19,7 @@ export function NavShell({ children }: { children: React.ReactNode }) {
         <Link href="/approvals">Approvals</Link>
         <Link href="/activity">Activity</Link>
         <Link href="/policy">Policy</Link>
+        <Link href="/connectors">Connectors</Link>
         <a
           onClick={(e) => {
             e.preventDefault();

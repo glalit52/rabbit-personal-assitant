@@ -11,6 +11,7 @@
   "dependencies": {
     "@agent/audit": "workspace:*",
     "@agent/auth": "workspace:*",
+    "@agent/connectors": "workspace:*",
     "@agent/core": "workspace:*",
     "@agent/db": "workspace:*",
     "@agent/event-bus": "workspace:*",

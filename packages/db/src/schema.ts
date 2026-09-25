@@ -102,9 +102,17 @@ export const identities = pgTable(
     scopes: jsonb("scopes").$type<string[]>().notNull().default([]),
     credentialId: uuid("credential_id").references(() => credentials.id, { onDelete: "set null" }),
     health: identityHealthEnum("health").notNull().default("connected"),
+    /** The provider's own identifier for this account: a Gmail address, a WhatsApp phone_number_id, a calendar id. */
+    externalAccountId: varchar("external_account_id", { length: 255 }),
+    /** Provider-specific sync bookkeeping: Gmail historyId, WhatsApp wabaId, the last synced-at timestamp, etc. */
+    metadata: jsonb("metadata").$type<Record<string, unknown>>().notNull().default({}),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => [index("identities_tenant_id_idx").on(table.tenantId)],
+  (table) => [
+    index("identities_tenant_id_idx").on(table.tenantId),
+    index("identities_provider_idx").on(table.tenantId, table.provider),
+  ],
 );
 
 export const contacts = pgTable(

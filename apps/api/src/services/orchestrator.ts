@@ -75,7 +75,7 @@ async function handleInboundMessage(
   const policy = await getTenantPolicy(db, event.tenantId);
   const actionType = CHANNEL_TO_ACTION_TYPE[thread.channel] ?? "send_email";
 
-  await proposeAndDecideAction(db, ctx.auditLogger, ctx.rateLimiter, policy, {
+  await proposeAndDecideAction(ctx, policy, {
     tenantId: event.tenantId,
     type: actionType,
     targetSystem: thread.channel,

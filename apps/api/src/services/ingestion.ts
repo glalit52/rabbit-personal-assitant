@@ -10,6 +10,8 @@ export interface InboundMessageInput {
   contactHandle: string;
   contactName?: string;
   content: string;
+  /** The provider's own message id (Gmail message id, WhatsApp wamid, ...), for idempotent re-ingestion. */
+  providerMessageId?: string;
 }
 
 /**
@@ -20,6 +22,18 @@ export interface InboundMessageInput {
  */
 export async function ingestInboundMessage(ctx: AppContext, input: InboundMessageInput) {
   const { db } = ctx;
+
+  if (input.providerMessageId) {
+    const existing = await db.query.messages.findFirst({
+      where: and(
+        eq(schema.messages.tenantId, input.tenantId),
+        eq(schema.messages.providerMessageId, input.providerMessageId),
+      ),
+    });
+    if (existing) {
+      return { contact: undefined, thread: undefined, message: existing, duplicate: true as const };
+    }
+  }
 
   let contact = await db.query.contacts.findFirst({
     where: and(
@@ -35,6 +49,9 @@ export async function ingestInboundMessage(ctx: AppContext, input: InboundMessag
         tenantId: input.tenantId,
         names: input.contactName ? [input.contactName] : [],
         handles: [input.contactHandle],
+        // Keep a channel-typed copy too, so a reply can be addressed without re-parsing the handle.
+        emails: input.channel === "email" ? [input.contactHandle] : [],
+        phones: input.channel === "whatsapp" || input.channel === "sms" ? [input.contactHandle] : [],
       })
       .returning();
     contact = created;
@@ -75,6 +92,7 @@ export async function ingestInboundMessage(ctx: AppContext, input: InboundMessag
       threadId: thread.id,
       direction: "inbound",
       content: input.content,
+      providerMessageId: input.providerMessageId,
     })
     .returning();
   if (!message) {
@@ -91,5 +109,5 @@ export async function ingestInboundMessage(ctx: AppContext, input: InboundMessag
   };
   await ctx.eventBus.publish(event);
 
-  return { contact, thread, message };
+  return { contact, thread, message, duplicate: false as const };
 }

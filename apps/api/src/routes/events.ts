@@ -16,11 +16,14 @@ export function eventRoutes(ctx: AppContext) {
       "/events/inbound",
       { preHandler: requireAuth },
       async (request, reply) => {
-        const { thread, message, contact } = await ingestInboundMessage(ctx, {
+        const result = await ingestInboundMessage(ctx, {
           tenantId: request.session!.tenantId,
           ...request.body,
         });
-        return reply.code(202).send({ threadId: thread.id, messageId: message.id, contactId: contact.id });
+        if (result.duplicate) {
+          return reply.code(202).send({ messageId: result.message.id, duplicate: true });
+        }
+        return reply.code(202).send({ threadId: result.thread.id, messageId: result.message.id, contactId: result.contact.id });
       },
     );
   };
