@@ -133,6 +133,11 @@ button.danger {
   color: var(--danger);
 }
 
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 input,
 select {
   font: inherit;
