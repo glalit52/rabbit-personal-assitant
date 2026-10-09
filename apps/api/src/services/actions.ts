@@ -30,10 +30,9 @@ export interface ProposeActionInput {
 }
 
 /**
- * Proposes an action, runs it through the policy engine, persists the decision, and
- * — only when the decision is ALLOW — executes it via the connector for its type
- * (`executeAction`). A connector failure marks the action `failed` rather than
- * silently pretending to have sent something.
+ * Proposes an action, runs it through the policy engine, persists the decision, then
+ * executes ALLOWed actions through the matching connector (`executeAction`).
+ * A connector failure marks the action `failed`. It never pretends something was sent.
  */
 export async function proposeAndDecideAction(ctx: AppContext, policy: TenantPolicy, input: ProposeActionInput) {
   const { db, auditLogger: audit, rateLimiter } = ctx;

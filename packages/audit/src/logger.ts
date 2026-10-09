@@ -13,9 +13,9 @@ export interface AuditLogEntry {
 }
 
 /**
- * Append-only writer for the audit trail (PRD §9/§10). There is deliberately no
- * update or delete here — the DB schema doesn't expose one either — so "why did the
- * Agent send this?" always has an answer nobody, including the Agent, can edit later.
+ * Append-only writer for the audit trail (PRD §9/§10). Updates and deletes are
+ * deliberately missing here and in the DB schema, so "why did the Agent send this?"
+ * always has an answer that nobody can edit later, not even the Agent.
  */
 export class AuditLogger {
   constructor(private readonly db: Database) {}

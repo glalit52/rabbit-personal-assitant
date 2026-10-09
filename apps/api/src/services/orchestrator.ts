@@ -9,9 +9,9 @@ import { extractCommitment } from "./commitments.js";
 /**
  * The agent loop for text channels (PRD §5 orchestrator): on every inbound message,
  * triage it, draft a reply in the owner's voice, and hand the proposed reply to the
- * policy engine. This is intentionally the simplest possible version of that loop —
- * one model call to classify, one to draft, no tool use, no memory retrieval yet —
- * so every later phase (RAG, connectors, sub-agents) has a working seam to extend.
+ * policy engine. This is the simplest version of that loop that still works:
+ * one model call to classify, one to draft, no tool use, no memory retrieval yet.
+ * Every later phase (RAG, connectors, sub-agents) extends this seam.
  */
 export function startOrchestrator(ctx: AppContext): () => void {
   return ctx.eventBus.subscribe<{ messageId: string; threadId: string; contactId: string }>(

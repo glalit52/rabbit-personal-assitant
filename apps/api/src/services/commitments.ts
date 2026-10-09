@@ -13,8 +13,8 @@ interface ExtractedCommitment {
 }
 
 /**
- * One model call per inbound message, looking for something the sender is now
- * waiting on — a promise, a deadline, an ask that needs a reply (PRD F9). Most
+ * One model call per inbound message. It looks for anything the sender is now
+ * waiting on: a promise, a deadline, an ask that needs a reply (PRD F9). Most
  * messages have none; this is deliberately cheap (fast tier, tiny output) since it
  * runs on every message, not just ones that end up mattering.
  */
@@ -93,11 +93,10 @@ export async function listCommitments(ctx: AppContext, tenantId: string, status?
 }
 
 /**
- * Every commitment whose due date has passed and hasn't been chased since — proposes
- * one follow-up action through the normal policy-engine path (PRD's own example: "If
- * there is no reply in 48 hours, it follows up once"). Meant to be called on a
- * schedule; there's no in-process cron here (see README), so it's exposed as an
- * endpoint a scheduler or an operator can hit.
+ * Finds every commitment past its due date that has not been chased yet and proposes
+ * one follow-up through the normal policy path (PRD's own example: "If there is no
+ * reply in 48 hours, it follows up once"). There is no in-process cron here
+ * (see README), so this stays an endpoint a scheduler or an operator can hit.
  */
 export async function chaseOverdueCommitments(ctx: AppContext, tenantId: string): Promise<{ chased: number }> {
   const now = new Date();
@@ -136,7 +135,7 @@ export async function chaseCommitment(ctx: AppContext, tenantId: string, commitm
     payload: {
       threadId: thread.id,
       contactId,
-      draft: `Following up on: ${commitment.description}. Just checking in — is there any update?`,
+      draft: `Following up on: ${commitment.description}. Any update on this?`,
     },
     rationale: `Automatic follow-up: "${commitment.description}" is overdue`,
   });

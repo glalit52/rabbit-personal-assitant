@@ -2,8 +2,8 @@ const AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth";
 const TOKEN_URL = "https://oauth2.googleapis.com/token";
 
 /**
- * One consent screen covers both Gmail and Calendar — a tenant connects Google once
- * and gets both (PRD §4: Gmail, Google Workspace, Google Calendar).
+ * One consent screen covers Gmail and Calendar together. The tenant connects Google
+ * once and gets both (PRD §4: Gmail, Google Workspace, Google Calendar).
  */
 export const GOOGLE_SCOPES = [
   "https://www.googleapis.com/auth/gmail.readonly",
@@ -69,7 +69,7 @@ export async function exchangeGoogleAuthCode(config: GoogleOAuthConfig, code: st
   const data = (await res.json()) as GoogleTokenResponse;
   if (!data.refresh_token) {
     throw new Error(
-      "Google did not return a refresh token — the user may need to revoke prior access at https://myaccount.google.com/permissions and reconnect (offline access is only granted on first consent)",
+      "Google did not return a refresh token. The user may need to revoke prior access at https://myaccount.google.com/permissions and reconnect (Google only grants offline access on first consent)",
     );
   }
   return {

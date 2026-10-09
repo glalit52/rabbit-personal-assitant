@@ -3,8 +3,8 @@ import type { AgentEvent, AgentEventType } from "@agent/core";
 import type { EventBus, EventHandler, Unsubscribe } from "./bus.js";
 
 /**
- * Single-process event bus for local development and tests. Not durable — retries,
- * dead-lettering and cross-process delivery need the Redis-backed bus in production.
+ * Single-process event bus for local development and tests. It is not durable.
+ * Retries, dead-lettering and cross-process delivery need the Redis-backed bus, so use that in production.
  */
 export class InMemoryEventBus implements EventBus {
   private readonly emitter = new EventEmitter();

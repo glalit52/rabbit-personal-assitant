@@ -77,7 +77,7 @@ export const tenantUsers = pgTable(
   ],
 );
 
-/** Encrypted-at-rest OAuth/API credentials. The plaintext never reaches this table — see @agent/secrets. */
+/** Encrypted-at-rest OAuth/API credentials. Plaintext never reaches this table (see @agent/secrets). */
 export const credentials = pgTable(
   "credentials",
   {

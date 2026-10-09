@@ -24,7 +24,7 @@ async function graphFetch<T>(accessToken: string, path: string, init: RequestIni
     headers: {
       Authorization: `Bearer ${accessToken}`,
       "Content-Type": "application/json",
-      // Ask for plain text bodies instead of HTML — one less thing to strip downstream.
+      // Ask for plain text bodies instead of HTML so there is less to strip downstream.
       Prefer: 'outlook.body-content-type="text"',
       ...init.headers,
     },
@@ -47,9 +47,9 @@ function normalize(raw: GraphMessage): NormalizedOutlookMessage {
 }
 
 /**
- * Delta query (PRD §5 ingestion, incremental sync — the Outlook equivalent of Gmail's
- * historyId): pass the previous call's deltaLink back in to get only what changed.
- * Omit it for the first sync, which both backfills and hands back a deltaLink to
+ * Delta query for incremental sync (PRD §5 ingestion, the Outlook equivalent of
+ * Gmail's historyId). Pass the previous call's deltaLink back in to get only what
+ * changed. Omit it for the first sync, which backfills and returns a deltaLink to
  * store for next time.
  */
 export async function listOutlookInboxDelta(

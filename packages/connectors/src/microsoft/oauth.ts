@@ -1,9 +1,9 @@
 const AUTHORITY = "https://login.microsoftonline.com/common/oauth2/v2.0";
 
 /**
- * `common` accepts both personal Microsoft accounts and work/school (Microsoft 365)
- * accounts with one app registration — matches the PRD's "Outlook / Microsoft 365"
- * line item without asking the tenant which kind of account they have.
+ * `common` accepts personal Microsoft accounts and work/school (Microsoft 365)
+ * accounts under one app registration. That matches the PRD's "Outlook / Microsoft
+ * 365" item without asking the tenant which kind they have.
  */
 export const MICROSOFT_SCOPES = [
   "offline_access",
@@ -64,7 +64,7 @@ export async function exchangeMicrosoftAuthCode(config: MicrosoftOAuthConfig, co
   }
   const data = (await res.json()) as MicrosoftTokenResponse;
   if (!data.refresh_token) {
-    throw new Error("Microsoft did not return a refresh token — offline_access must be granted on consent");
+    throw new Error("Microsoft did not return a refresh token. Grant offline_access on consent");
   }
   return {
     accessToken: data.access_token,
@@ -92,7 +92,7 @@ export async function refreshMicrosoftAccessToken(
     throw new Error(`Microsoft token refresh failed (${res.status}): ${await res.text()}`);
   }
   const data = (await res.json()) as MicrosoftTokenResponse;
-  // Microsoft rotates refresh tokens on every use, unlike Google — the old one is invalid after this call.
+  // Microsoft rotates refresh tokens on every use. Unlike Google, the old one stops working after this call.
   return {
     accessToken: data.access_token,
     refreshToken: data.refresh_token ?? refreshToken,

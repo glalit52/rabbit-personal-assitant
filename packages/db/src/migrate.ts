@@ -1,4 +1,5 @@
 import postgres from "postgres";
+import { fileURLToPath } from "node:url";
 import { drizzle } from "drizzle-orm/postgres-js";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 
@@ -11,7 +12,7 @@ async function main() {
   // pgvector must exist before the generated migrations reference the `vector` type.
   await sql`CREATE EXTENSION IF NOT EXISTS vector`;
   const db = drizzle(sql);
-  await migrate(db, { migrationsFolder: new URL("../migrations", import.meta.url).pathname });
+  await migrate(db, { migrationsFolder: fileURLToPath(new URL("../migrations", import.meta.url)) });
   await sql.end();
   // eslint-disable-next-line no-console
   console.log("Migrations applied.");

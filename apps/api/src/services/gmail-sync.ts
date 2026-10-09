@@ -8,12 +8,11 @@ import { ingestInboundMessage } from "./ingestion.js";
 const BACKFILL_MAX_RESULTS = 15;
 
 /**
- * Polling stand-in for Gmail push notifications (PRD §4 calls for Pub/Sub push;
- * that needs a verified GCP Pub/Sub topic and domain, which is infrastructure to
- * provision, not code to write, so a poll — driven by `POST /connectors/gmail/sync`
- * or a scheduler hitting the same endpoint — is the pragmatic v1). Incremental after
- * the first run: Gmail's history API returns only what changed since the last
- * historyId, so a poll is cheap once the tenant is caught up.
+ * Polling stand-in for Gmail push notifications. PRD §4 wants Pub/Sub push, but that
+ * needs a verified GCP Pub/Sub topic and domain (infra to provision, not code to
+ * write). So v1 polls instead, via `POST /connectors/gmail/sync` or a scheduler
+ * hitting the same endpoint. After the first run it is incremental: Gmail's history
+ * API returns only what changed since the last historyId, so each poll stays cheap.
  */
 export async function syncGmailInbox(ctx: AppContext, tenantId: string): Promise<{ synced: number; historyId: string }> {
   if (!ctx.vault) {

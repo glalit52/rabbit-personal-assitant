@@ -16,9 +16,9 @@ export function verifyWhatsAppSubscription(
 }
 
 /**
- * Every webhook delivery is signed with the app secret (PRD §10: verify sender
- * before acting). `rawBody` must be the exact bytes Meta sent — parsing JSON and
- * re-serializing before verifying will not match the signature.
+ * Every webhook delivery carries a signature made with the app secret (PRD §10:
+ * verify the sender before acting). `rawBody` must hold the exact bytes Meta sent.
+ * Parsing the JSON and re-serializing it first will not match the signature.
  */
 export function verifyWhatsAppSignature(appSecret: string, rawBody: Buffer, signatureHeader: string | undefined): boolean {
   if (!signatureHeader?.startsWith("sha256=")) {
@@ -62,8 +62,8 @@ interface WhatsAppWebhookPayload {
 }
 
 /**
- * Only text messages become inbound events for now — media/interactive/location
- * message types are left for a later pass (PRD's F4/F5 scope covers text first).
+ * Only text messages become inbound events for now. Media, interactive and location
+ * messages wait for a later pass (PRD's F4/F5 scope covers text first).
  */
 export function parseWhatsAppWebhookPayload(body: unknown): NormalizedWhatsAppMessage[] {
   const payload = body as WhatsAppWebhookPayload;

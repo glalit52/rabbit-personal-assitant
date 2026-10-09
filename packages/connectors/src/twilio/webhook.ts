@@ -1,11 +1,11 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 
 /**
- * Twilio's request-validation algorithm: HMAC-SHA1(authToken, url + sorted param
- * key+value pairs concatenated with no separator), base64-encoded (PRD §10, sender
- * verification). `url` must be the exact webhook URL configured in the Twilio
- * console, including query string if any — a mismatched scheme or trailing slash
- * produces a different signature than the one Twilio sent.
+ * Twilio's request-validation algorithm: HMAC-SHA1(authToken, url plus sorted param
+ * key/value pairs concatenated with no separator), base64-encoded (PRD §10, sender
+ * verification). `url` must exactly match the webhook URL in the Twilio console,
+ * query string included. A wrong scheme or trailing slash produces a different
+ * signature than the one Twilio sent.
  */
 export function verifyTwilioSignature(
   authToken: string,

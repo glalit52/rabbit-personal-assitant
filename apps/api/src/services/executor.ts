@@ -38,7 +38,7 @@ export async function executeAction(ctx: AppContext, action: Action): Promise<Ex
       default:
         return {
           success: true,
-          result: { note: `No connector implemented yet for action type "${action.type}" — logged only` },
+          result: { note: `No connector for action type "${action.type}" yet. Logged without sending.` },
         };
     }
   } catch (err) {
@@ -54,20 +54,20 @@ async function getContact(ctx: AppContext, contactId: string) {
 
 function requireVault(ctx: AppContext) {
   if (!ctx.vault) {
-    throw new Error("VAULT_MASTER_KEY is not configured — connector credentials cannot be decrypted");
+    throw new Error("VAULT_MASTER_KEY is not configured, so connector credentials cannot be decrypted");
   }
   return ctx.vault;
 }
 
 /**
- * A tenant connects one mail+calendar account at a time for now (PRD's "1 to 3 email
- * accounts" per persona is a later multi-account phase) — whichever of Google or
- * Microsoft is connected handles both mail and calendar actions for that tenant.
+ * A tenant connects one mail+calendar account at a time for now. Multi-account
+ * support (PRD's "1 to 3 email accounts" per persona) comes later. Whichever of
+ * Google or Microsoft is connected handles both mail and calendar for that tenant.
  */
 async function requireEmailCalendarProvider(ctx: AppContext, tenantId: string): Promise<"google" | "microsoft"> {
   const provider = await findConnectedEmailCalendarProvider(ctx.db, tenantId);
   if (!provider) {
-    throw new Error("No connected Google or Microsoft account for this tenant — connect one on the Connectors page");
+    throw new Error("No connected Google or Microsoft account for this tenant. Connect one on the Connectors page");
   }
   return provider;
 }

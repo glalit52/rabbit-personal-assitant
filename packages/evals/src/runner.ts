@@ -5,8 +5,8 @@ const EVAL_TENANT_ID = "00000000-0000-0000-0000-000000000000";
 
 /**
  * "A regression set of real, anonymized tasks per capability, run on every prompt or
- * model change; track task success" (PRD §6). This runner is the seed of that harness —
- * wire it into CI once real prompts and per-tenant fixtures exist.
+ * model change; track task success" (PRD §6). This runner is the seed of that harness.
+ * Wire it into CI once real prompts and per-tenant fixtures exist.
  */
 export async function runEvals(router: ModelRouter, cases: EvalCase[]): Promise<EvalSummary> {
   const results: EvalResult[] = [];

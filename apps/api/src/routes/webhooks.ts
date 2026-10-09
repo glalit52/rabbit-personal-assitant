@@ -7,7 +7,7 @@ import { findTenantIdByTwilioNumber, getTwilioConfig } from "../services/connect
 import { ingestInboundMessage } from "../services/ingestion.js";
 
 /**
- * Public, unauthenticated by design — Meta calls these directly. Trust is established
+ * Public and unauthenticated on purpose. Meta calls these directly, so trust is established
  * per-request instead: the GET handshake checks a shared verify token, the POST
  * handler checks Meta's HMAC signature over the raw body (PRD §10, sender verification).
  */
@@ -36,7 +36,7 @@ export function webhookRoutes(ctx: AppContext) {
         return reply.code(401).send();
       }
 
-      // Ack immediately — Meta expects a fast 200 and will retry deliveries that don't get one.
+      // Ack at once. Meta expects a fast 200 and retries anything slower.
       reply.code(200).send();
 
       const messages = whatsapp.parseWhatsAppWebhookPayload(request.body);
@@ -58,8 +58,8 @@ export function webhookRoutes(ctx: AppContext) {
     });
 
     // Twilio (SMS): each tenant brings their own Twilio account, so the webhook
-    // signature is verified with that tenant's own auth token, not a shared secret —
-    // the "To" number (our tenant's Twilio number) is what tells us which one to use.
+    // signature is verified with that tenant's own auth token, not a shared secret.
+    // The "To" number (our tenant's Twilio number) tells us which token to use.
     app.post<{ Body: Record<string, string> }>("/webhooks/sms", async (request, reply) => {
       const params = request.body ?? {};
       const inbound = twilioApi.parseTwilioInboundSms(params);

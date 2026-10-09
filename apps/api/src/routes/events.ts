@@ -6,9 +6,8 @@ import { ingestInboundMessage } from "../services/ingestion.js";
 
 /**
  * Demo ingestion endpoint standing in for real channel adapters (Gmail push, WhatsApp
- * webhook, ...). It exists so the whole pipeline — ingest, triage, draft, policy
- * decision, approval queue, audit log — can be exercised end to end before any real
- * connector is built.
+ * webhook, ...). It runs the full pipeline end to end before any real connector
+ * exists: ingest, triage, draft, policy decision, approval queue, audit log.
  */
 export function eventRoutes(ctx: AppContext) {
   return async function (app: FastifyInstance) {

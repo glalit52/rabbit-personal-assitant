@@ -16,9 +16,9 @@ interface XaiChatResponse {
 }
 
 /**
- * Grok via the xAI API (OpenAI-compatible chat completions surface). Used for live
- * web/X search and cheap high-volume passes (PRD §6) — never for actions that write
- * to a tool without a policy-engine check on the way out.
+ * Grok through the xAI API (OpenAI-compatible chat completions surface). Used for live
+ * web/X search and cheap high-volume passes (PRD §6). It never drives an action that
+ * writes through a tool unless the policy engine checked it on the way out.
  */
 export class XaiProvider implements ModelProvider {
   readonly name: string;

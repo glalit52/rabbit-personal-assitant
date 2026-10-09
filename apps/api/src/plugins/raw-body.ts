@@ -2,7 +2,7 @@ import type { FastifyInstance } from "fastify";
 
 declare module "fastify" {
   interface FastifyRequest {
-    /** The exact bytes of the request body, captured before JSON parsing — needed to verify webhook HMAC signatures. */
+    /** Raw request body bytes, captured before JSON parsing for webhook HMAC checks. */
     rawBody?: Buffer;
   }
 }

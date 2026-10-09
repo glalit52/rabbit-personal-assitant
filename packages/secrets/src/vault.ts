@@ -10,10 +10,10 @@ export interface EncryptedSecret {
 /**
  * Envelope encryption for OAuth tokens and other tenant credentials (PRD §10: "OAuth
  * tokens in a secrets vault with KMS envelope encryption"). Every secret gets its own
- * random data key (DEK); the DEK is wrapped by a key-encryption key (KEK) that this
- * interface never exposes to callers. Swap `LocalEnvelopeVault` for a `KmsVault` that
- * wraps/unwraps the DEK via AWS KMS / GCP KMS / Azure Key Vault without touching any
- * caller code — the interface is the contract, not the key management backend.
+ * random data key (DEK). A key-encryption key (KEK) wraps the DEK, and this interface
+ * never exposes the KEK to callers. To move to real KMS, swap `LocalEnvelopeVault`
+ * for a `KmsVault` that wraps/unwraps the DEK via AWS KMS, GCP KMS or Azure Key Vault.
+ * No caller code changes. The interface is the contract, not the backend.
  */
 export interface Vault {
   encrypt(plaintext: Record<string, unknown>): Promise<EncryptedSecret>;
@@ -23,9 +23,9 @@ export interface Vault {
 const ALGO = "aes-256-gcm";
 
 /**
- * Local development / single-region KEK implementation. The KEK is a 32-byte key from
- * VAULT_MASTER_KEY (base64). Never point this at a shared production master key without
- * also putting it behind an actual KMS — this class stores the KEK in process memory.
+ * Local development and single-region KEK implementation. The KEK is a 32-byte key from
+ * VAULT_MASTER_KEY (base64). Never point it at a shared production master key unless
+ * a real KMS sits behind it. This class keeps the KEK in process memory.
  */
 export class LocalEnvelopeVault implements Vault {
   private readonly kek: Buffer;
