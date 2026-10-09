@@ -15,7 +15,7 @@ function requireMicrosoftConfig() {
   const config = env.microsoft;
   if (!config) {
     throw new Error(
-      "Microsoft OAuth is not configured — set MICROSOFT_CLIENT_ID and MICROSOFT_CLIENT_SECRET (see README for setup steps)",
+      "Microsoft OAuth is not configured. Set MICROSOFT_CLIENT_ID and MICROSOFT_CLIENT_SECRET (see README for setup steps)",
     );
   }
   return config;

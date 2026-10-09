@@ -36,10 +36,10 @@ const ACTION_TYPE_CHANNEL: Record<string, string> = {
 };
 
 /**
- * Evaluates one proposed action against tenant policy (PRD §9). Hard guardrails are
- * checked first and can only ever tighten the outcome — never the autonomy ladder
- * loosening past them. Deny-by-default: an action type with no configured autonomy
- * level is treated as L0 (observe only).
+ * Evaluates one proposed action against tenant policy (PRD §9). Hard guardrails run
+ * first and can only tighten the outcome. The autonomy ladder never loosens past
+ * them. Deny by default: an action type with no configured autonomy level is
+ * treated as L0 (observe only).
  */
 export function evaluateAction(
   action: Action,

@@ -1,7 +1,7 @@
 /**
- * Per-tenant daily token budget (PRD §6, "cost guardrails"). When a tenant is over
- * budget the router restricts routing to providers registered as "cheap" tier instead
- * of failing outright — a downgrade, not an outage.
+ * Per-tenant daily token budget (PRD §6, "cost guardrails"). When a tenant goes over
+ * budget the router only uses providers registered as the "cheap" tier instead of
+ * failing outright. That is a downgrade, not an outage.
  */
 export interface TenantBudgetTracker {
   recordUsage(tenantId: string, totalTokens: number): void;

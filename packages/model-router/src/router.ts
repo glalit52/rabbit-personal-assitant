@@ -10,7 +10,7 @@ interface RegisteredProvider {
 }
 
 export interface ModelRouterOptions {
-  /** Ordered fallback chain of provider names per task type — first is primary. */
+  /** Fallback chain of provider names per task type, in order. The first one is primary. */
   routingTable: Partial<Record<ModelTaskType, string[]>>;
   budgetTracker?: TenantBudgetTracker;
   /** Providers registered but not yet cost-verified may be silently skipped instead of failing. */

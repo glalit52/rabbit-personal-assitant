@@ -2,7 +2,7 @@
   "name": "rabbit-personal-assistant",
   "private": true,
   "version": "0.1.0",
-  "description": "Personal & Business AI Agent — monorepo (Phase 0: foundations)",
+  "description": "Personal and Business AI Agent monorepo (Phase 0 foundations)",
   "packageManager": "pnpm@9.12.0",
   "engines": {
     "node": ">=20"

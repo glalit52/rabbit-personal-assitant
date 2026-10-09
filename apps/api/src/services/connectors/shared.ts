@@ -1,7 +1,7 @@
 import { and, eq } from "drizzle-orm";
 import { schema, type Database } from "@agent/db";
 
-/** Connecting again replaces whatever was there — one account per provider per tenant for now. */
+/** Reconnecting replaces the old account. One account per provider per tenant for now. */
 export async function disconnectProvider(db: Database, tenantId: string, provider: string): Promise<void> {
   const existing = await db.query.identities.findFirst({
     where: and(eq(schema.identities.tenantId, tenantId), eq(schema.identities.provider, provider)),
@@ -14,9 +14,9 @@ export async function disconnectProvider(db: Database, tenantId: string, provide
 }
 
 /**
- * A tenant has at most one connected mail+calendar provider at a time (connecting one
- * disconnects the other — see `connectGoogleAccount`/`connectMicrosoftAccount`), so
- * this is really just "which one, if either" rather than a preference order.
+ * A tenant has at most one connected mail+calendar provider at a time. Connecting one
+ * disconnects the other (see `connectGoogleAccount`/`connectMicrosoftAccount`), so
+ * this just answers "which one, if either".
  */
 export async function findConnectedEmailCalendarProvider(
   db: Database,

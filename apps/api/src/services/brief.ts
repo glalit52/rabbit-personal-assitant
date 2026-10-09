@@ -17,8 +17,8 @@ export interface DailyBrief {
 
 /**
  * "Morning summary, end-of-day report of what was handled, what is waiting, and
- * risks" (PRD F13). No scheduler runs this automatically yet (see README) — it's a
- * live snapshot computed on request, which is also what a scheduled job would call.
+ * risks" (PRD F13). Nothing schedules it yet (see README). It computes a live
+ * snapshot on request, which is also what a scheduled job would call.
  */
 export async function getDailyBrief(ctx: AppContext, tenantId: string): Promise<DailyBrief> {
   const since = new Date(Date.now() - DAY_MS);
@@ -39,8 +39,7 @@ export async function getDailyBrief(ctx: AppContext, tenantId: string): Promise<
       where: and(eq(schema.threads.tenantId, tenantId), gte(schema.threads.createdAt, since)),
     }),
     ctx.db.query.commitments.findMany({
-      // "overdue" is not resolved — a commitment that's already been chased once should
-      // keep showing up as a risk until it's actually done or cancelled.
+      // A chased commitment stays listed as a risk until it is done or cancelled.
       where: and(eq(schema.commitments.tenantId, tenantId), inArray(schema.commitments.status, ["open", "overdue"])),
     }),
     ctx.db.query.auditEvents.findMany({

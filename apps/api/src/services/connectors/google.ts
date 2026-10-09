@@ -15,7 +15,7 @@ function requireGoogleConfig() {
   const config = env.google;
   if (!config) {
     throw new Error(
-      "Google OAuth is not configured — set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET (see README for setup steps)",
+      "Google OAuth is not configured. Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET (see README for setup steps)",
     );
   }
   return config;

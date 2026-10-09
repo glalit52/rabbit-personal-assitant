@@ -15,7 +15,7 @@ export function commitmentRoutes(ctx: AppContext) {
       return reply.code(202).send();
     });
 
-    // Meant to be hit by a scheduler (cron, Temporal, ...) — see README "Scheduled jobs".
+    // Called by a scheduler (cron, Temporal, ...). See README "Scheduled jobs".
     app.post("/commitments/chase-overdue", { preHandler: requireAuth }, async (request) => {
       return chaseOverdueCommitments(ctx, request.session!.tenantId);
     });

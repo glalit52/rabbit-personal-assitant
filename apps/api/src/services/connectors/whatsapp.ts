@@ -17,10 +17,9 @@ export interface ConfigureWhatsAppInput {
 }
 
 /**
- * There's no per-tenant OAuth flow for WhatsApp Business the way there is for Google —
- * onboarding a number requires the owner to go through Meta's Embedded Signup (or
- * WhatsApp Manager) themselves first and hand us the resulting phone_number_id and a
- * permanent access token (PRD §4: "Meta Cloud API via Meta directly or a BSP").
+ * WhatsApp Business has no per-tenant OAuth flow like Google does. The owner finishes
+ * Meta's Embedded Signup (or WhatsApp Manager) first, then hands over the resulting
+ * phone_number_id and a permanent access token (PRD §4: "Meta Cloud API via Meta directly or a BSP").
  */
 export async function configureWhatsAppAccount(db: Database, vault: Vault, tenantId: string, input: ConfigureWhatsAppInput): Promise<void> {
   await disconnectProvider(db, tenantId, "whatsapp_business");

@@ -3,7 +3,7 @@ import "./globals.css";
 import { NavShell } from "./nav-shell";
 
 export const metadata: Metadata = {
-  title: "the Agent — Control Center",
+  title: "the Agent Control Center",
   description: "Approvals, activity and policy for your AI agent",
 };
 

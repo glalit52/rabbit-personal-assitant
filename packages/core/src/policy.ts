@@ -1,7 +1,7 @@
 import type { AutonomyLevel } from "./autonomy.js";
 import type { ActionType } from "./action.js";
 
-/** Hard guardrails, enforced in code by the policy engine — never left to a prompt (PRD §9). */
+/** Hard guardrails, enforced in code by the policy engine and never left to a prompt (PRD §9). */
 export interface Guardrails {
   /** Max amount (in the tenant's currency's smallest unit) a single action may move/commit. */
   maxSpendPerActionMinor: number;
@@ -19,7 +19,7 @@ export interface Guardrails {
 
 /**
  * Per-tenant policy: an autonomy level per action type, plus the hard guardrails.
- * Deny-by-default — an action type with no explicit entry is treated as L0 (observe only).
+ * Deny by default: an action type with no explicit entry is treated as L0 (observe only).
  */
 export interface TenantPolicy {
   tenantId: string;

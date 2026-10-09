@@ -1,8 +1,8 @@
 /**
- * A connected external account. `google` and `microsoft` each cover mail + calendar
- * in one OAuth connection (Gmail+Calendar, Outlook mail+Calendar respectively) —
- * matching how each provider's own OAuth consent screen works, rather than treating
- * mail and calendar as separate connections to the same account.
+ * A connected external account. `google` and `microsoft` each cover mail and calendar
+ * in a single OAuth connection (Gmail+Calendar, Outlook mail+Calendar). That matches
+ * how each provider's own consent screen works. Mail and calendar are not tracked as
+ * separate connections to the same account.
  */
 export type Provider =
   | "google"
@@ -26,7 +26,7 @@ export interface Identity {
   provider: Provider;
   /** Scopes actually granted by the provider, least-privilege. */
   scopes: string[];
-  /** Opaque reference into the secrets vault — never the raw token. */
+  /** Opaque reference into the secrets vault. Never the raw token. */
   credentialRef: string;
   health: IdentityHealth;
   createdAt: string;
